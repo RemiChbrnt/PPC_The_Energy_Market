@@ -21,6 +21,14 @@ def energPriceChang(precedPrice, carbonPrice, purchasingPow, politic, isTechnica
 
 
 if __name__ == "__main__":
+    carbonPrice =
+    purchasingPow =
+    politic =
+    isTechnicalFailure =
+    isVirus =
+    isFreeEnergyDay =
+    isTsunami =
+    conso =
     p = Process(target = energPriceChang, args = (precedPrice, carbonPrice, purchasingPow, politic, isTechnicalFailure, isVirus, isFreeEnergyDay, isTsunami, conso,))
     p.start()
     p.join()
