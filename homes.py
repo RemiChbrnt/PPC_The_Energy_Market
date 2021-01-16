@@ -1,22 +1,30 @@
 import random
+import time
 import concurrent.futures
-import signal
+import os
+import threading
+import sysv_ipc
+
+key = 128
 
 
-def homes(initCons, initProd, status):
+
+def home(initCons, initProd, status, name, barrier):
+    day = 0
+    print("DEBUG HOME :: House %s: starting" % name)
+    while True:
+        print("DEBUG HOME :: House %s: Day %d | Cons %s | Prod %s)
 
 
+    if status == True {
 
 
-if __name__ == "__main__":
-    indexes = [random.randint(0, 100) for i in range(10)]
+    }
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-        print("Results returned via asynchronous map:")
-        for result in executor.map(fibonacci, indexes):
-            print(result)
+    #    print("Fils: os.getpid() = %s, os.getppid() = %s \n" % (os.getpid(), os.getppid()))
+    
+        time.sleep(2)
+        barrier.wait()
+        day += 1
+    print("Thread %s: finishing" % name)
 
-        print("Results returned as Future objects as they complete:")
-        futures = [executor.submit(fibonacci, index) for index in indexes]
-        for future in concurrent.futures.as_completed(futures):
-            print(future.result())
