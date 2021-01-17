@@ -2,6 +2,8 @@
             il faudrait que carbonPrice soit la différence entre le prix du carbone avant et maintenat
             il faudrait définir un prix de base (genre celui de la première itération)
             il faudrait que conso soit aussi une différence (comme ça si elle est négative le prix baisse et inversement)"""
+
+# KWh Price : 0.16 €
 from multiprocessing import Process
 from queue import Queue
 
@@ -26,13 +28,13 @@ def economics (qEco) :
     carbonPrice = 0.001
     purchasingPow = 5;
     eco = [carbonPrice, purchasingPow]
-    while true:
+    while True:
         purchasingPow = purchasingPow + random.randint(-1, 1)
         eco = [carbonPrice, purchasingPow]
         qEco.put(eco)
 
 
-if __name__ == "__main__":
+def run():
     qEco = Queue()
     #lancement process economics
     pEco = Process(target = economics, args = (qEco,))
