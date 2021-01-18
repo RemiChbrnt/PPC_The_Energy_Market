@@ -26,6 +26,7 @@ if __name__ == '__main__':
         
         print("#DEBUG MAIN :: Creating Homes")
         for i in range(nbHomes):
-            executor.submit(homes.home, 5.0, 3.0, True, i+1, weatherSM, b, bHomes)
-        
-
+            if i==0:
+                executor.submit(homes.home, 5.0, 10.0, True, i+1, weatherSM, b, bHomes)
+            else:
+                executor.submit(homes.home, 5.0, 3.0, True, i+1, weatherSM, b, bHomes)

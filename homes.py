@@ -30,20 +30,17 @@ def home(cons, prod, status, name, weatherSM, barrier, barrierHomes):
             excess = prodDaily-consDaily
             print("#DEBUG HOME :: House %s: Giving production excess %.2f " % (name, excess))
             messageExcess = str(excess).encode()
-            try:
-                mqHomes.send(messageExcess, timeout is 2)
-            except:
-                print("#DEBUG HOME :: House %s: No one needing excess " % name)
+            mqHomes.send(messageExcess)
 
         else:
+            time.sleep(2)
             try:
-                messExcess, t = mqHomes.receive(timeout is 1)
+                messExcess, t = mqHomes.receive(block = False)
+                excess = float(messExcess.decode())
+                print("#DEBUG HOME :: House %s: Getting production excess %.2f " % (name, excess))
+
             except:
                 print("#DEBUG HOME :: House %s: No offer found" % name)
-            
-            excess = messExcess.decode()
-            excess = float(excess)    
-            print("#DEBUG HOME :: House %s: Getting production excess %.2f " % (name, excess))
 
         barrierHomes.wait()
     #    print("Fils: os.getpid() = %s, os.getppid() = %s \n" % (os.getpid(), os.getppid()))
