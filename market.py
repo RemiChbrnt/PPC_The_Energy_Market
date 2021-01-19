@@ -26,12 +26,61 @@ def energPriceChang(precedPrice, carbonPrice, purchasingPow, politic, isTechnica
 
 def economics (qEco) :
     carbonPrice = 0.001
-    purchasingPow = 5;
+    purchasingPow = 5
     eco = [carbonPrice, purchasingPow]
     while True:
         purchasingPow = purchasingPow + random.randint(-1, 1)
         eco = [carbonPrice, purchasingPow]
         qEco.put(eco)
+
+
+def politics ():
+    degPol = 7
+    while True :
+        degPol = degPol + random.randint(-1, 1)
+        pid = os.getppid()
+        if degPol <=3 :
+            os.kill(pid, signal.SIGUSR1)
+
+def cataclysme ():
+    probVirus = random.uniform(0, 1)
+    probFailure = random.uniform(0, 1)
+    probFree = random.uniform(0, 1)
+    probTsunami = random.uniform(0, 1)
+    pid = os.getppid()
+    if probVirus < 0.07 :
+        os.kill(pid, signal.SIGPROF)
+    if probFailure < 0.1 :
+        os.kill(pid, signal.SIGUSR2)
+    if probFree < 0.04 :
+        os.kill(pid, signal.SIGIOT)
+    if probTsunami < 0.01 :
+        os.kill(pid, signal.SIGWINCH)
+
+def signaux (sig,frame):
+    global isTechnicalFailure
+    global isFreeEnergyDay
+    global isTsunami
+    global isVirus
+
+    if sig == signal.SIGUSR1 :
+        politic = True
+    if sig == signal.SIGUSR2 :
+        lockFailure.acquire()
+        isTechnicalFailure = True
+        lockFailure.release()
+    if sig == signal.SIGIOT :
+        lockFree.acquire()
+        isFreeEnergyDay = True
+        lockFree.release()
+    if sig == signal.SIGWINCH :
+        lockTsunami.acquire()
+        isTsunami = True
+        lockTsunami.release()
+    if sig == signal.SIGPROF :
+        lockVirus.acquire()
+        isVirus = True
+        lockVirus.release()
 
 
 def run():
@@ -45,12 +94,29 @@ def run():
     precedPrice = 0.1
     carbonPrice = res [0]
     purchasingPow = res[1]
+
     politic = false
     isTechnicalFailure = false
     isVirus = false
     isFreeEnergyDay = false
     isTsunami = false
-    conso = 10
+
+    #redirection des signaux
+    signal.signal(signal.SIGUSR1, signaux) #pour politic
+    signal.signal(signal.SIGUSR2, signaux) #pour isTechnicalFailure
+    signal.signal(signal.SIGIOT, signaux) #pour isFreeEnergyDay
+    signal.signal(signal.SIGWINCH, signaux) #pour isTsunami
+    signal.signal(signal.SIGPROF, signaux) #pour isVirus
+
+    lockFailure = threading.Lock()
+    lockVirus = threading.Lock()
+    lockFree = threading.Lock()
+    lockTsunami = threading.Lock()
+
+    pCata = Process(target = cataclysme, args =(,))
+
+    conso = 10 #à mettre en lien avec les homes
+
     p = Process(target = energPriceChang, args = (precedPrice, carbonPrice, purchasingPow, politic, isTechnicalFailure, isVirus, isFreeEnergyDay, isTsunami, conso,))
     p.start()
     p.join()
