@@ -4,25 +4,48 @@
             il faudrait que conso soit aussi une différence (comme ça si elle est négative le prix baisse et inversement)"""
 
 # KWh Price : 0.16 €
+import time
+import os
+import sysv_ipc
+import threading
+
 from multiprocessing import Process
 from queue import Queue
 
-def energPriceChang(precedPrice, carbonPrice, purchasingPow, politic, isTechnicalFailure, isVirus, isFreeEnergyDay, isTsunami, conso):
-    newPrice = precedPrice * (1 + conso * 0.001)
-    if isFreeEnergyDay == true :
-        newPrice = 0
-    else :
-        newPrice = newPrice + 0.02 * (carbonPrice + purchasingPow/10)
-        if politic == true :
-            newPrice = newPrice + 0.03
-        if isTechnicalFailure == true :
-            newPrice = newPrice + 0.015
-        if isVirus == true :
-            newPrice = newPrice + 0.02
-        if isTsunami == true :
-            newPrice = newPrice + 0.025
+def runMarket(initPrice, b):
+    mqMarket = sysv_ipc.MessageQueue(256)
+    day = 0
+    isTsunami = False
+    isTechnicalFailure = False
+    isVirus = False
+    isFreeEnergyDay = False
 
-        print(newPrice)
+    carbonPrice = 0.001
+    politic = False
+    purchasingPow = 5
+    conso = 10
+    price = initPrice
+    print("#DEBUG MARKET :: Starting market")
+    while True:
+        price = price * (1 + conso * 0.001)
+        if isFreeEnergyDay == True :
+            price = 0
+        else :
+            price = price + 0.02 * (carbonPrice + purchasingPow/10)
+            if politic == True :
+                price += 0.03
+            if isTechnicalFailure == True :
+                price += 0.015
+            if isVirus == True :
+                price += 0.02
+            if isTsunami == True :
+                price += 0.025
+        print("#DEBUG MARKET :: Day %d : price is %.2f" % (day, price))
+        b.wait()
+        day +=1
+
+
+
 
 def economics (qEco) :
     carbonPrice = 0.001
@@ -32,6 +55,7 @@ def economics (qEco) :
         purchasingPow = purchasingPow + random.randint(-1, 1)
         eco = [carbonPrice, purchasingPow]
         qEco.put(eco)
+
 
 
 def politics ():
@@ -83,8 +107,9 @@ def signaux (sig,frame):
         lockVirus.release()
 
 
-def run():
-    qEco = Queue()
+
+def run(b):
+    """qEco = Queue()
     #lancement process economics
     pEco = Process(target = economics, args = (qEco,))
     pEco.start()
@@ -100,6 +125,7 @@ def run():
     isVirus = false
     isFreeEnergyDay = false
     isTsunami = false
+
 
     #redirection des signaux
     signal.signal(signal.SIGUSR1, signaux) #pour politic
@@ -118,5 +144,8 @@ def run():
     conso = 10 #à mettre en lien avec les homes
 
     p = Process(target = energPriceChang, args = (precedPrice, carbonPrice, purchasingPow, politic, isTechnicalFailure, isVirus, isFreeEnergyDay, isTsunami, conso,))
+
+    conso = 10"""
+    p = Process(target = runMarket, args = (0.16, b,))
     p.start()
     p.join()
