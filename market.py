@@ -82,13 +82,16 @@ def cataclysme ():
         os.kill(pid, signal.SIGWINCH)
 
 def signaux (sig,frame):
+    global politic
     global isTechnicalFailure
     global isFreeEnergyDay
     global isTsunami
     global isVirus
 
     if sig == signal.SIGUSR1 :
+        lockPol.acquire()
         politic = True
+        lockPol.release()
     if sig == signal.SIGUSR2 :
         lockFailure.acquire()
         isTechnicalFailure = True
@@ -134,12 +137,15 @@ def run(b):
     signal.signal(signal.SIGWINCH, signaux) #pour isTsunami
     signal.signal(signal.SIGPROF, signaux) #pour isVirus
 
+    lockPol = threading.Lock()
     lockFailure = threading.Lock()
     lockVirus = threading.Lock()
     lockFree = threading.Lock()
     lockTsunami = threading.Lock()
 
     pCata = Process(target = cataclysme, args =(,))
+    pCata.start()
+    pCata.join()
 
     conso = 10 #à mettre en lien avec les homes
 
